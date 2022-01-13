@@ -64,7 +64,7 @@ defmodule Protobuf.DSL do
       cond do
         # If both "defstruct" and "@type t()" are called, it's probably okay because it's the code
         # we used to generated before from this library, but we want to get rid of it, so we warn.
-        unquote(defines_defstruct?) and unquote(defines_t_type?) ->
+        unquote(defines_defstruct?) and unquote(defines_t_type?) and not unquote(msg_props.enum?) ->
           IO.warn("""
           Since v0.10.0 of the :protobuf library, the t/0 type and the struct are automatically \
           generated for modules that call "use Protobuf" if they are Protobuf enums or messages. \
@@ -77,7 +77,7 @@ defmodule Protobuf.DSL do
         # the code through this library or they modified the generated files. In either case,
         # let's raise here since we could have inconsistencies between the user-defined spec/type
         # and our type/spec, respectively.
-        unquote(defines_defstruct?) or unquote(defines_t_type?) ->
+        (unquote(defines_defstruct?) or unquote(defines_t_type?)) and not unquote(msg_props.enum?) ->
           raise """
           since v0.10.0 of the :protobuf library, the t/0 type and the struct are automatically \
           generated for modules that call "use Protobuf" if they are Protobuf enums or messages. \
@@ -95,6 +95,10 @@ defmodule Protobuf.DSL do
               definition
 
           """
+
+        # Newest version of this library generate t/0 for enums.
+        unquote(msg_props.enum?) ->
+          unquote(def_t_typespec(msg_props, extension_props))
 
         # Newest version of this library generate both the t/0 type as well as the struct.
         true ->
