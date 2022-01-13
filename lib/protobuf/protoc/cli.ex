@@ -18,7 +18,7 @@ defmodule Protobuf.Protoc.CLI do
 
   """
 
-  alias Protobuf.Protoc.Context
+  alias Protobuf.Protoc.{Context, ExtensionLoader}
 
   # Entrypoint for the escript (protoc-gen-elixir).
   @doc false
@@ -50,6 +50,8 @@ defmodule Protobuf.Protoc.CLI do
       %Context{}
       |> parse_params(request.parameter || "")
       |> find_types(request.proto_file, request.file_to_generate)
+
+    request = ExtensionLoader.rewrite_request_with_extensions(ctx, request)
 
     files =
       Enum.flat_map(request.file_to_generate, fn file ->
