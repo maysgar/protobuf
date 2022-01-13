@@ -98,10 +98,10 @@ defmodule Protobuf.DSL do
 
         # Newest version of this library generate t/0 for enums.
         unquote(defines_t_type?) and unquote(msg_props.enum?) ->
-          unquote(def_t_typespec(msg_props, extension_props))
+          :ok
 
         unquote(msg_props.enum?) ->
-          :ok
+          unquote(def_t_typespec(msg_props, extension_props))
 
         # Newest version of this library generate both the t/0 type as well as the struct.
         true ->
